@@ -1,4 +1,7 @@
+//
+
 import { createContext, useEffect, useState } from "react";
+import axios from "axios";
 
 export const ProductContext = createContext();
 
@@ -13,26 +16,19 @@ export const ProductContextProvider = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("https://fakestoreapi.com/products");
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const jsonData = await res.json();
-        setData(jsonData);
-
-        const initialCart = {};
-        jsonData.forEach((item) => {
-          initialCart[item.id] = 0;
-        });
-        setCart(initialCart);
-      } catch (error) {
-        setError(error.message);
-      } finally {
+        const response = await axios.get("https://fakestoreapi.com/products");
+        //console.log(response)
+        setData(response.data);
         setLoading(false);
+      } catch (error) {
+        //console.error('Error fetching data:', error);
+        setError("Product not fetched");
       }
     };
 
     fetchData();
+
+    return () => {};
   }, []);
 
   const addItem = (itemId) => {
@@ -68,7 +64,6 @@ export const ProductContextProvider = (props) => {
       }
     }
     return totalprice;
-    // This function can calculate the total price based on the cart
   };
 
   return (
